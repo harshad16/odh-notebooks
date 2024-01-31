@@ -1,0 +1,99 @@
+---
+# The aim of this GitHub workflow is to update the pipfile to sync with Codeflare-SDK release.
+name: Sync with codeflare-release
+on:  # yamllint disable-line rule:truthy
+  workflow_dispatch:
+    inputs:
+      codeflare_sdk_release_version:
+        required: true
+        description: "Provide the version of the codeflare release you want to update to : "
+      branch:
+        required: true
+        description: "Provide the name of the branch you want to update ex main, vYYYYx etc: "
+
+env:
+  BRANCH_NAME: ${{ github.event.inputs.branch || 'main' }}
+  CODEFLARE_RELEASE_VERSION: ${{ github.event.inputs.codeflare_sdk_release_version }}
+  UPDATER_BRANCH: codeflare-sync-updater-${{ github.run_id }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      # Give the default GITHUB_TOKEN write permission to commit and push the
+      # added or changed files to the repository.
+      contents: write
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: ${{ env.BRANCH_NAME }}
+
+    # Create a new branch
+    - name: Create a new branch
+      run: |
+        echo ${{ env.UPDATER_BRANCH }}
+        git checkout -b ${{ env.UPDATER_BRANCH }}
+        git push --set-upstream origin ${{ env.UPDATER_BRANCH }}
+
+    - name: Setup Python environment
+      uses: actions/setup-python@v4
+      with:
+        python-version: |
+          3.8
+          3.9
+
+    - name: Install pipenv
+      run: pip install pipenv
+
+    - name: Configure Git
+      run: |
+         git config --global user.email "github-actions[bot]@users.noreply.github.com"
+         git config --global user.name "GitHub Actions"
+
+    # Make sure to be on UPDATER branch
+    - name: Checkout branch
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ env.UPDATER_BRANCH }}
+
+    - name: Start Sync 
+      run: |
+        ls -la
+        cd jupyter/datascience/ubi8-python-3.8 && pipenv install codeflare-sdk~="${CODEFLARE_RELEASE_VERSION}"
+        cd jupyter/datascience/ubi9-python-3.9 && pipenv install codeflare-sdk~="${CODEFLARE_RELEASE_VERSION}"
+        cd jupyter/pytorch/ubi9-python-3.9 && pipenv install codeflare-sdk~="${CODEFLARE_RELEASE_VERSION}"
+        cd jupyter/tensorflow/ubi9-python-3.9 && pipenv install codeflare-sdk~="${CODEFLARE_RELEASE_VERSION}"
+        cd jupyter/trustyai/ubi8-python-3.8 && pipenv install codeflare-sdk~="${CODEFLARE_RELEASE_VERSION}"
+        cd jupyter/trustyai/ubi9-python-3.9 && pipenv install codeflare-sdk~="${CODEFLARE_RELEASE_VERSION}"
+        cd runtimes/datascience/ubi8-python-3.8 && pipenv install codeflare-sdk~="${CODEFLARE_RELEASE_VERSION}"
+        cd runtimes/datascience/ubi9-python-3.9 && pipenv install codeflare-sdk~="${CODEFLARE_RELEASE_VERSION}"
+        cd runtimes/pytorch/ubi9-python-3.9 && pipenv install codeflare-sdk~="${CODEFLARE_RELEASE_VERSION}"
+        cd runtimes/pytorch/ubi8-python-3.8 && pipenv install codeflare-sdk~="${CODEFLARE_RELEASE_VERSION}"
+        cd runtimes/tensorflow/ubi8-python-3.8 && pipenv install codeflare-sdk~="${CODEFLARE_RELEASE_VERSION}"
+        cd runtimes/tensorflow/ubi9-python-3.9 && pipenv install codeflare-sdk~="${CODEFLARE_RELEASE_VERSION}"
+
+    - name: Push changes
+      run: |
+        git fetch origin ${{ env.UPDATER_BRANCH }} && \
+        git pull origin ${{ env.UPDATER_BRANCH }} && \
+        git commit -am "Updated Codeflare-SDK via ${{ env.UPDATER_BRANCH }} GitHub action" && \
+        git push origin ${{ env.UPDATER_BRANCH }}
+
+    - name: pull-request
+      uses: repo-sync/pull-request@v2
+      with:
+        source_branch: ${{ env.UPDATER_BRANCH }}
+        destination_branch: ${{ env.BRANCH_NAME}}
+        github_token: ${{ secrets.TOKEN }}
+        pr_label: "automated pr"
+        pr_title: "[Digest Updater Action] Update notebook's pipfile to sync with Codeflare-SDK release"
+        pr_body: |
+          :rocket: This is an automated Pull Request.
+
+          This PR updates the all Pipfile's with latest Codeflare-SDK release.
+
+          Created by `/.github/workflows/codeflare-release-sync.yaml`
+
+          :exclamation: **IMPORTANT NOTE**: Remember to delete the ` ${{ env.UPDATER_BRANCH }}` branch after merging the changes
