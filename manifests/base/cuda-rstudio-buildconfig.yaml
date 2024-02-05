@@ -85,11 +85,13 @@ spec:
       name: "cuda-rhel9:latest"
   resources:
     limits:
-      cpu: "1"
-      memory: 1Gi
+      cpu: "2"
+      memory: 4Gi
+      ephemeral-storage: 2Gi
     requests:
-      cpu: "1"
-      memory: 1Gi
+      cpu: "2"
+      memory: 4Gi
+      ephemeral-storage: 2Gi
   runPolicy: Serial
   triggers:
     - imageChange: {}
@@ -145,11 +147,13 @@ spec:
       name: "cuda-rstudio-rhel9:latest"
   resources:
     limits:
-      cpu: "1"
-      memory: 1Gi
+      cpu: "4"
+      memory: 8Gi
+      ephemeral-storage: 4Gi
     requests:
-      cpu: "1"
-      memory: 1Gi
+      cpu: "4"
+      memory: 8Gi
+      ephemeral-storage: 4Gi
   runPolicy: Serial
   triggers:
     - imageChange: {}

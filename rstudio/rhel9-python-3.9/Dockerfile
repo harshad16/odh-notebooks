@@ -2,6 +2,11 @@ ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
 # Access the client's secret for the subscription manager from the environment variable
+ARG USERNAME
+ARG PASSWORD
+ARG SERVERURL
+ARG BASEURL
+
 ENV USERNAME=$USERNAME
 ENV PASSWORD=$PASSWORD
 # These should be removed after testing the recipe

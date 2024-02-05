@@ -72,11 +72,13 @@ spec:
   runPolicy: Serial
   resources:
     limits:
-      cpu: "1"
-      memory: 1Gi
+      cpu: "2"
+      memory: 4Gi
+      ephemeral-storage: 2Gi
     requests:
-      cpu: "1"
-      memory: 1Gi
+      cpu: "2"
+      memory: 4Gi
+      ephemeral-storage: 2Gi
   triggers:
     - imageChange: {}
       type: ImageChange
