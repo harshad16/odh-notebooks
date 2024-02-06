@@ -1,6 +1,10 @@
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
+
+RUN ls -la /opt/app-root/data && \
+    echo /opt/app-root/data/rhel-subscription-secret
+
 # Access the client's secret for the subscription manager from the environment variable
 ENV USERNAME=$USERNAME
 ENV PASSWORD=$PASSWORD
