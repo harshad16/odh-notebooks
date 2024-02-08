@@ -6,15 +6,18 @@ ARG SECRET_DIR=/opt/app-root/src/.sec
 ARG SERVERURL_DEFAULT=""
 ARG BASEURL_DEFAULT=""
 
+# Set an environment variable to allow for the installation of R packages
+ENV R_PACKAGES=$R_PACKAGES
+
 LABEL name="odh-notebook-rstudio-rhel9-python-3.9" \
-      summary="R Studio image with python 3.9 based on Red Hat Enterprise Linux 9" \
-      description="Code Server (VS Code) image with python 3.9 based on Red Hat Enterprise Linux 9" \
-      io.k9s.display-name="R Studio image with python 3.9 based on Red Hat Enterprise Linux 9" \
-      io.k9s.description="R Studio image with python 3.9 based on Red Hat Enterprise Linux 9" \
-      authoritative-source-url="https://github.com/opendatahub-io/notebooks" \
-      io.openshift.build.commit.ref="main" \
-      io.openshift.build.source-location="https://github.com/opendatahub-io/notebooks/tree/main/rstudio/rhel9-python-3.9" \
-      io.openshift.build.image="quay.io/opendatahub/workbench-images:rstudio-rhel9-python-3.9"
+    summary="R Studio image with python 3.9 based on Red Hat Enterprise Linux 9" \
+    description="Code Server (VS Code) image with python 3.9 based on Red Hat Enterprise Linux 9" \
+    io.k9s.display-name="R Studio image with python 3.9 based on Red Hat Enterprise Linux 9" \
+    io.k9s.description="R Studio image with python 3.9 based on Red Hat Enterprise Linux 9" \
+    authoritative-source-url="https://github.com/opendatahub-io/notebooks" \
+    io.openshift.build.commit.ref="main" \
+    io.openshift.build.source-location="https://github.com/opendatahub-io/notebooks/tree/main/rstudio/rhel9-python-3.9" \
+    io.openshift.build.image="quay.io/opendatahub/workbench-images:rstudio-rhel9-python-3.9"
 
 USER root
 
@@ -65,6 +68,18 @@ RUN wget https://download2.rstudio.org/server/rhel9/x86_64/rstudio-server-rhel-2
 RUN chmod 1777 /var/run/rstudio-server && \
     mkdir -p /usr/share/doc/R
 COPY rstudio/rhel9-python-3.9/rsession.conf /etc/rstudio/rsession.conf
+
+# Install OS binaries, R packages and dependencies
+RUN dnf install -y libsodium-devel.x86_64 libgit2-devel.x86_64 libcurl-devel harfbuzz-devel.x86_64 fribidi-devel.x86_64 cmake "flexiblas-*"
+RUN R -e "install.packages('Rcpp')"
+RUN R -e "install.packages('remotes')"
+RUN if [ -n "$R_PACKAGES" -a "$R_PACKAGES" != "false" ]; \
+    then R -e 'require(remotes) && \
+        install_version("tidyverse", version = "2.0.0", repos = "http://cran.us.r-project.org") && \
+        install_version("tidymodels", version = "1.1.1", repos = "http://cran.us.r-project.org") && \ 
+        install_version("plumber", version = "1.2.1", repos = "http://cran.us.r-project.org") && \
+        install_version("vetiver", version = "0.2.5", repos = "http://cran.us.r-project.org") && \
+        install_version("devtools", version = "2.4.5", repos = "http://cran.us.r-project.org") ';fi
 
 # Install NGINX to proxy RStudio and pass probes check
 ENV NGINX_VERSION=1.22 \

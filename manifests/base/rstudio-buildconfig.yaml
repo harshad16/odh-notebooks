@@ -22,6 +22,15 @@ spec:
       referencePolicy:
         type: Source
 ---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: rstudio-config
+immutable: false
+data:
+  R_PACKAGES: ''
+
+---
 kind: BuildConfig
 apiVersion: build.openshift.io/v1
 metadata:
@@ -41,6 +50,13 @@ spec:
         kind: "DockerImage"
         name: "quay.io/modh/odh-base-rhel9:base-rhel9-python-3.9-20240131-378dafd"
       dockerfilePath: "rstudio/rhel9-python-3.9/Dockerfile"
+      env:
+        - name: R_PACKAGES
+          valueFrom:
+            configMapKeyRef:
+              name: rstudio-config
+              key: R_PACKAGES
+              optional: true
       volumes:
         - name: secret-mvn
           source:
