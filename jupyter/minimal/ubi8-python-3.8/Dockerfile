@@ -33,3 +33,4 @@ WORKDIR /opt/app-root/src
 RUN sed -i -e "s/Python.*/$(python --version | cut -d '.' -f-2)\",/" /opt/app-root/share/jupyter/kernels/python3/kernel.json
 
 ENTRYPOINT ["start-notebook.sh"]
+
