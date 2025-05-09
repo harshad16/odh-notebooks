@@ -2,24 +2,24 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - jupyter-minimal-notebook-imagestream.yaml
-  - jupyter-datascience-notebook-imagestream.yaml
-  - jupyter-minimal-gpu-notebook-imagestream.yaml
-  - jupyter-pytorch-notebook-imagestream.yaml
-  - jupyter-tensorflow-notebook-imagestream.yaml
-  - jupyter-trustyai-notebook-imagestream.yaml
-  - code-server-notebook-imagestream.yaml
-  - rstudio-notebook-imagestream.yaml
-  - rstudio-gpu-notebook-imagestream.yaml
-  - jupyter-rocm-minimal-notebook-imagestream.yaml
-  - jupyter-rocm-pytorch-notebook-imagestream.yaml
-  - jupyter-rocm-tensorflow-notebook-imagestream.yaml
-  - runtime-datascience-imagestream.yaml
+  # - jupyter-minimal-notebook-imagestream.yaml
+  # - jupyter-datascience-notebook-imagestream.yaml
+  # - jupyter-minimal-gpu-notebook-imagestream.yaml
+  # - jupyter-pytorch-notebook-imagestream.yaml
+  # - jupyter-tensorflow-notebook-imagestream.yaml
+  # - jupyter-trustyai-notebook-imagestream.yaml
+  # - code-server-notebook-imagestream.yaml
+  # - rstudio-notebook-imagestream.yaml
+  # - rstudio-gpu-notebook-imagestream.yaml
+  # - jupyter-rocm-minimal-notebook-imagestream.yaml
+  # - jupyter-rocm-pytorch-notebook-imagestream.yaml
+  # - jupyter-rocm-tensorflow-notebook-imagestream.yaml
+  # - runtime-datascience-imagestream.yaml
   - runtime-minimal-imagestream.yaml
   - runtime-pytorch-imagestream.yaml
-  - runtime-rocm-pytorch-imagestream.yaml
-  - runtime-rocm-tensorflow-imagestream.yaml
-  - runtime-tensorflow-imagestream.yaml
+  # - runtime-rocm-pytorch-imagestream.yaml
+  # - runtime-rocm-tensorflow-imagestream.yaml
+  # - runtime-tensorflow-imagestream.yaml
 
 configMapGenerator:
   - envs:
